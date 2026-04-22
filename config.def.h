@@ -14,8 +14,9 @@ static const unsigned int gappov    = 5;       /* vert outer gap between windows
 static        int smartgaps          = 1;        /* 1 means no outer gap when there is only one window */
 static const char *fonts[] = {
     "DejaVuSansMono:size=14",
-    "Font Awesome 6 Free:pixelsize=14"
+    "Font Awesome 6 Free:pixelsize=14",
     "FiraCode Nerd Font:pixelsize=14"
+
 };
 static const char dmenufont[]       = "monospace:size=12";
 static const char col_gray1[]       = "#222222";
