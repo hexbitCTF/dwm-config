@@ -31,15 +31,15 @@ static const char *colors[][3]      = {
 };
 
 /* tagging */
-static const char *tags[] = { "", "", "", "📖", "📝", "🌐", "", "", ""};
+static const char *tags[] = { "", "", "📖", "📝"};
 
 static const Rule rules[] = {
     { "Gimp",     NULL,       NULL,       0,            0,           1},
-    { "firefox",  NULL,       NULL,       1 << 8,       0,           0},
+    { "firefox",  NULL,       NULL,       1 << 3,       0,           0},
 
     { "Code",     NULL,       NULL,       1 << 2,       0,           0},
     
-    { "whatsapp", NULL,       NULL,       1 << 7,       0,           0},
+    { "whatsapp", NULL,       NULL,       1 << 0,       0,           0},
     { "anytype",  NULL,       NULL,       1 << 3,       0,           0},
 };
 
