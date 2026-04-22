@@ -2285,15 +2285,15 @@ run_tag_scripts(void)
 
     char cmd[512];
 
-    /* run wallpaper script in background */
+    /* run wallpaper script in background
     snprintf(cmd, sizeof(cmd),
         "sh -c '%s/setup/scripts/wallpaper.sh %d &'", home, tag);
     system(cmd);
 
-    /* run centered text script and write output */
+       run centered text script and write output
     snprintf(cmd, sizeof(cmd),
         "sh -c '%s/setup/scripts/centered-text.sh %d > /tmp/dwm_center_text &'", home, tag);
-    system(cmd);
+    system(cmd); */
 }
 
 
