@@ -34,6 +34,7 @@
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include <X11/Xproto.h>
 #include <X11/Xutil.h>
 #ifdef XINERAMA
@@ -58,7 +59,7 @@
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel }; /* color schemes */
+enum { SchemeNorm, SchemeSel, SchemeBarNorm }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
        NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
@@ -224,6 +225,7 @@ static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
 static void togglebar(const Arg *arg);
+static void togglebaralpha(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void togglescratch(const Arg *arg);
 static void toggletag(const Arg *arg);
@@ -257,6 +259,10 @@ static const char broken[] = "broken";
 static char stext[256];
 static int statusw;
 static int statussig;
+static int transparentbar = 1;
+static Visual *barvisual = NULL;
+static Colormap barcmap;
+static int bardepth = 0;
 static pid_t statuspid = -1;
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
@@ -852,11 +858,13 @@ draw_status_segment(char *text, int x, int max_w)
 void
 drawbar(Monitor *m)
 {
-    int x, w, tw = 0;
+    int x, w;
     int boxs = drw->fonts->h / 9;
     int boxw = drw->fonts->h / 6 + 2;
     unsigned int i, occ = 0, urg = 0;
     Client *c;
+    int hasclients = 0;
+    int bar_transparent;
 
     if (!m->showbar)
         return;
@@ -865,11 +873,25 @@ drawbar(Monitor *m)
         occ |= c->tags;
         if (c->isurgent)
             urg |= c->tags;
+        if (ISVISIBLE(c))
+            hasclients = 1;
     }
+
+    bar_transparent = transparentbar && (!hasclients || !m->lt[m->sellt]->arrange);
+
+    /* Draw full bar background first (behind everything) */
+    if (bar_transparent) {
+        drw_setscheme(drw, scheme[SchemeBarNorm]);
+        drw_rect(drw, 0, 0, m->ww, bh, 1, 1);
+    }
+
     x = 0;
     for (i = 0; i < LENGTH(tags); i++) {
         w = TEXTW(tags[i]);
-        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
+        if (m->tagset[m->seltags] & 1 << i)
+            drw_setscheme(drw, scheme[SchemeSel]);
+        else
+            drw_setscheme(drw, scheme[bar_transparent ? SchemeBarNorm : SchemeNorm]);
         drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
         if (occ & 1 << i)
             drw_rect(drw, x + boxs, boxs, boxw, boxw,
@@ -878,15 +900,17 @@ drawbar(Monitor *m)
         x += w;
     }
     w = TEXTW(m->ltsymbol);
-    drw_setscheme(drw, scheme[SchemeNorm]);
+    drw_setscheme(drw, scheme[bar_transparent ? SchemeBarNorm : SchemeNorm]);
     x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
-    /* Draw the rest of the bar background */
-    drw_setscheme(drw, scheme[SchemeNorm]);
-    drw_rect(drw, x, 0, m->ww - x, bh, 1, 1);
+    /* Fill remaining bar background (opaque only) */
+    if (!bar_transparent) {
+        drw_setscheme(drw, scheme[SchemeNorm]);
+        drw_rect(drw, x, 0, m->ww - x, bh, 1, 1);
+    }
 
     if (m == selmon) {
-        drw_setscheme(drw, scheme[SchemeNorm]);
+        drw_setscheme(drw, scheme[bar_transparent ? SchemeBarNorm : SchemeNorm]);
 
         if (splitstatus) {
             char *orig = strdup(stext);
@@ -1811,7 +1835,18 @@ setup(void)
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
 	root = RootWindow(dpy, screen);
-	drw = drw_create(dpy, screen, root, sw, sh);
+
+	/* find ARGB visual for transparent bar */
+	{
+		XVisualInfo vinfo;
+		if (XMatchVisualInfo(dpy, screen, 32, TrueColor, &vinfo)) {
+			barvisual = vinfo.visual;
+			bardepth = vinfo.depth;
+			barcmap = XCreateColormap(dpy, root, barvisual, AllocNone);
+		}
+	}
+
+	drw = drw_create(dpy, screen, root, sw, sh, barvisual, barcmap, bardepth);
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;
@@ -1840,6 +1875,18 @@ setup(void)
 	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
 	for (i = 0; i < LENGTH(colors); i++)
 		scheme[i] = drw_scm_create(drw, colors[i], 3);
+	/* apply alpha to SchemeBarNorm background when ARGB visual is available */
+	if (barvisual) {
+		unsigned int r, g, b;
+		XRenderColor renderColor;
+		sscanf(col_bg + 1, "%2x%2x%2x", &r, &g, &b);
+		renderColor.red   = (r << 8) | r;
+		renderColor.green = (g << 8) | g;
+		renderColor.blue  = (b << 8) | b;
+		renderColor.alpha = 0x9999;
+		XftColorFree(dpy, barvisual, barcmap, &scheme[SchemeBarNorm][ColBg]);
+		XftColorAllocValue(dpy, barvisual, barcmap, &renderColor, &scheme[SchemeBarNorm][ColBg]);
+	}
 	/* init bars */
 	updatebars();
 	updatestatus();
@@ -1961,6 +2008,7 @@ spawn(const Arg *arg)
 	}
 }
 
+#if 0
 void
 swapfocus(const Arg *arg)
 {
@@ -1975,6 +2023,7 @@ swapfocus(const Arg *arg)
         }
     }
 }
+#endif
 
 void
 tag(const Arg *arg)
@@ -2002,6 +2051,13 @@ togglebar(const Arg *arg)
 	updatebarpos(selmon);
 	XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh);
 	arrange(selmon);
+}
+
+void
+togglebaralpha(const Arg *arg)
+{
+	transparentbar = !transparentbar;
+	drawbars();
 }
 
 void
@@ -2151,16 +2207,29 @@ updatebars(void)
 	Monitor *m;
 	XSetWindowAttributes wa = {
 		.override_redirect = True,
-		.background_pixmap = ParentRelative,
 		.event_mask = ButtonPressMask|ExposureMask
 	};
 	XClassHint ch = {"dwm", "dwm"};
+	unsigned long wamask = CWOverrideRedirect|CWEventMask;
+	if (barvisual) {
+		wa.background_pixel = 0;
+		wa.border_pixel = 0;
+		wa.colormap = barcmap;
+		wamask |= CWBackPixel|CWBorderPixel|CWColormap;
+	} else {
+		wa.background_pixmap = ParentRelative;
+		wamask |= CWBackPixmap;
+	}
 	for (m = mons; m; m = m->next) {
 		if (m->barwin)
 			continue;
-		m->barwin = XCreateWindow(dpy, root, m->wx, m->by, m->ww, bh, 0, DefaultDepth(dpy, screen),
-				CopyFromParent, DefaultVisual(dpy, screen),
-				CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
+		m->barwin = XCreateWindow(dpy, root, m->wx, m->by, m->ww, bh, 0,
+				bardepth ? bardepth : DefaultDepth(dpy, screen),
+				InputOutput,
+				barvisual ? barvisual : DefaultVisual(dpy, screen),
+				wamask, &wa);
+		if (barvisual)
+			XSetWindowColormap(dpy, m->barwin, barcmap);
 		XDefineCursor(dpy, m->barwin, cursor[CurNormal]->cursor);
 		XMapRaised(dpy, m->barwin);
 		XSetClassHint(dpy, m->barwin, &ch);
@@ -2421,8 +2490,7 @@ run_tag_scripts(void)
     const char *home = getenv("HOME");
     if (!home)
         home = "~";
-
-    char cmd[512];
+    (void)home;
 
     /* run wallpaper script in background
     snprintf(cmd, sizeof(cmd),
