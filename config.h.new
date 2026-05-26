@@ -20,11 +20,11 @@ static const char *fonts[] = {
 
 // {"FiraCode Nerd Font:pixelsize=18:antialias=true:autohint=true"};
 static const char dmenufont[]       = "monospace:size=12";
-static const char col_bg[]          = "#011423"; // Bar background / Normal bg
-static const char col_dark[]        = "#214969"; // Inactive window border
-static const char col_fg[]          = "#CBE0F0"; // Foreground text
-static const char col_accent[]      = "#0FC5ED"; // Active blue accent
-static const char col_sel_bg[]      = "#0a1628"; // Selection background
+static const char col_bg[]          = "#24283b"; // Bar background / Normal bg
+static const char col_dark[]        = "#1f2335"; // Inactive window border
+static const char col_fg[]          = "#c0caf5"; // Foreground text
+static const char col_accent[]      = "#7aa2f7"; // Active blue accent
+static const char col_sel_bg[]      = "#364a82"; // Selection background
 
 static const char *colors[][3]      = {
     /*               fg         bg         border   */
@@ -93,7 +93,6 @@ static const Key keys[] = {
         { MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
         { MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },
         { MODKEY,                       XK_b,      togglebar,      {0} },
-        { MODKEY,                       XK_t,      togglebaralpha, {0} },
         { MODKEY,                       XK_l,  	   focusstack,     {.i = +1 } },
         { MODKEY,                       XK_h,      focusstack,     {.i = -1 } },
         { MODKEY|ShiftMask,             XK_Up,     incnmaster,     {.i = +1 } },

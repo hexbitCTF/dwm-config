@@ -259,7 +259,7 @@ static const char broken[] = "broken";
 static char stext[256];
 static int statusw;
 static int statussig;
-static int transparentbar = 1;
+static int transparentbar = 0;
 static Visual *barvisual = NULL;
 static Colormap barcmap;
 static int bardepth = 0;
