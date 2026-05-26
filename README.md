@@ -29,16 +29,21 @@ The implementation works by:
 
 ## Tags
 
-The workspace system uses 9 tag slots, with 4 currently named:
+The workspace system uses 9 tag slots, with 8 currently named:
 
 | Slot | Tag | Primary Use |
 | :--: | :-: | :---------- |
-| 1 | 🏠 (house) | General / default workspace |
-| 2 | 🔒 (lock) | Private or secure applications |
-| 3 | 📖 (book) | Code editors and development |
-| 4 | 📝 (pencil) | Documents and writing |
+| 1 | 🏠 | Home — general desktop, personal apps |
+| 2 | 🛡️ | Security — pentesting tools, CTF, cybersecurity lab |
+| 3 | 🎮 | Gaming — Steam, Lutris, game launchers |
+| 4 | 📖 | Study — notes, ebooks, research papers |
+| 5 | 🌐 | Browse — Firefox, web browsing |
+| 6 | 💻 | Dev — code editors, terminals, IDE |
+| 7 | 🔒 | Private — encrypted/secure applications |
+| 8 | 📝 | Docs — documents, writing, office |
+| 9 | | Available for custom use |
 
-Tags 5–9 are unnamed and available for additional workspaces. Tags are navigated with `Super+[1-9]`, and windows can be moved between tags with `Super+Shift+[1-9]`.
+Tags are navigated with `Super+[1-9]`. Windows can be moved between tags with `Super+Shift+[1-9]`. Applications can be assigned to specific tags via the `rules[]` array in `config.h`.
 
 ## Layouts
 
@@ -50,7 +55,7 @@ Tags 5–9 are unnamed and available for additional workspaces. Tags are navigat
 
 ## Custom Config
 
-- **Font:** JetBrainsMono Nerd Font (16px) + Noto Color Emoji
+- **Font:** JetBrainsMono Nerd Font (14px) + Noto Color Emoji (14px)
 - **Color scheme:** Dark blue ocean (`#011423` bg, `#0FC5ED` blue accent, `#CBE0F0` text, `#214969` inactive border)
 - **Border width:** 2px
 - **Gaps:** 7px inner, 5px outer, smart gaps enabled (auto-hide outer gaps when only one window)
