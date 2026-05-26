@@ -13,36 +13,37 @@ static const unsigned int gappoh    = 5;       /* horiz outer gap between window
 static const unsigned int gappov    = 5;       /* vert outer gap between windows and screen edge */
 static        int smartgaps          = 1;        /* 1 means no outer gap when there is only one window */
 static const char *fonts[] = { 
-	"JetBrainsMono Nerd Font:size=16:autohint=true:antialias=true",
-	"Noto Color Emoji:pixelsize=18:antialias=true:autohint=true"
+	"JetBrainsMono Nerd Font:size=14:autohint=true:antialias=true",
+	"Noto Color Emoji:size=16:antialias=true:autohint=true"
  };
 
 
 // {"FiraCode Nerd Font:pixelsize=18:antialias=true:autohint=true"};
 static const char dmenufont[]       = "monospace:size=12";
-static const char col_bg[]          = "#24283b"; // Bar background / Normal bg
-static const char col_dark[]        = "#1f2335"; // Inactive window border
-static const char col_fg[]          = "#c0caf5"; // Foreground text
-static const char col_accent[]      = "#7aa2f7"; // Active blue accent
-static const char col_sel_bg[]      = "#364a82"; // Selection background
+static const char col_bg[]          = "#011423"; // Bar background / Normal bg
+static const char col_dark[]        = "#214969"; // Inactive window border
+static const char col_fg[]          = "#CBE0F0"; // Foreground text
+static const char col_accent[]      = "#0FC5ED"; // Active blue accent
+static const char col_sel_bg[]      = "#0a1628"; // Selection background
 
 static const char *colors[][3]      = {
     /*               fg         bg         border   */
     [SchemeNorm] = { col_fg,    col_bg,    col_dark },   // Normal window
     [SchemeSel]  = { col_fg,    col_accent, col_accent }, // Active window/tag
+    [SchemeBarNorm] = { col_fg, col_bg,    col_dark },   // Bar transparent (alpha applied programmatically)
 };  
 
 
 /* tagging */
-static const char *tags[] = { "🏠", "🔒", "📖", "📝" };
+static const char *tags[] = { "🏠", "🛡️", "🎮", "📖", "💻","🌍" };
 
 static const Rule rules[] = {
-    { "Gimp",     NULL,       NULL,       0,            0,           1},
-    { "firefox",  NULL,       NULL,       1 << 3,       0,           0},
+    { "Gimp",     NULL,       NULL,       0,            0,           0},
+    { "firefox",  NULL,       NULL,       1 << 5,       0,           0},
     { NULL,       NULL,       "scratchpad", 0,          1,           -1 },
-    { "Code",     NULL,       NULL,       1 << 2,       0,           0},
+    { "Code",     NULL,       NULL,       1 << 4,       0,           0},
     
-    { "whatsapp", NULL,       NULL,       1 << 1,       0,           0},
+    { "whatsapp", NULL,       NULL,       1 << 0,       0,           0},
     { "anytype",  NULL,       NULL,       1 << 3,       0,           0},
 };
 
@@ -92,6 +93,7 @@ static const Key keys[] = {
         { MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
         { MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },
         { MODKEY,                       XK_b,      togglebar,      {0} },
+        { MODKEY,                       XK_t,      togglebaralpha, {0} },
         { MODKEY,                       XK_l,  	   focusstack,     {.i = +1 } },
         { MODKEY,                       XK_h,      focusstack,     {.i = -1 } },
         { MODKEY|ShiftMask,             XK_Up,     incnmaster,     {.i = +1 } },
@@ -154,4 +156,3 @@ static const Button buttons[] = {
         { ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
         { ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
-

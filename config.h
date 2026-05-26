@@ -14,7 +14,7 @@ static const unsigned int gappov    = 5;       /* vert outer gap between windows
 static        int smartgaps          = 1;        /* 1 means no outer gap when there is only one window */
 static const char *fonts[] = { 
 	"JetBrainsMono Nerd Font:size=14:autohint=true:antialias=true",
-	"Noto Color Emoji:pixelsize=14:antialias=true:autohint=true"
+	"Noto Color Emoji:size=16:antialias=true:autohint=true"
  };
 
 
@@ -35,11 +35,11 @@ static const char *colors[][3]      = {
 
 
 /* tagging */
-static const char *tags[] = { "🏠", "🛡️", "🎮", "📖", "💻", "", "", "", "🌍" };
+static const char *tags[] = { "🏠", "🛡️", "🎮", "📖", "💻","🌍" };
 
 static const Rule rules[] = {
     { "Gimp",     NULL,       NULL,       0,            0,           0},
-    { "firefox",  NULL,       NULL,       1 << 8,       0,           0},
+    { "firefox",  NULL,       NULL,       1 << 5,       0,           0},
     { NULL,       NULL,       "scratchpad", 0,          1,           -1 },
     { "Code",     NULL,       NULL,       1 << 4,       0,           0},
     
