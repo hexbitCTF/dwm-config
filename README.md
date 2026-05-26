@@ -29,7 +29,7 @@ The implementation works by:
 
 ## Tags
 
-The workspace system uses 9 tag slots, with 8 currently named:
+The workspace system uses 9 tag slots, with 5 currently named:
 
 | Slot | Tag | Primary Use |
 | :--: | :-: | :---------- |
@@ -37,11 +37,9 @@ The workspace system uses 9 tag slots, with 8 currently named:
 | 2 | 🛡️ | Security — pentesting tools, CTF, cybersecurity lab |
 | 3 | 🎮 | Gaming — Steam, Lutris, game launchers |
 | 4 | 📖 | Study — notes, ebooks, research papers |
-| 5 | 🌐 | Browse — Firefox, web browsing |
-| 6 | 💻 | Dev — code editors, terminals, IDE |
-| 7 | 🔒 | Private — encrypted/secure applications |
-| 8 | 📝 | Docs — documents, writing, office |
-| 9 | | Available for custom use |
+| 5 | 💻 | Dev — code editors, terminals, IDE |
+| 6–8 | | Available for custom use |
+| 9 | 🌍 | Browse — Firefox, web browsing |
 
 Tags are navigated with `Super+[1-9]`. Windows can be moved between tags with `Super+Shift+[1-9]`. Applications can be assigned to specific tags via the `rules[]` array in `config.h`.
 
