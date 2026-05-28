@@ -40,8 +40,10 @@ static const char *tags[] = { "🏠", "🛡️", "🎮", "📖", "💻","🌍" }
 static const Rule rules[] = {
     { "Gimp",     NULL,       NULL,       0,            0,           0},
     { "firefox",  NULL,       NULL,       1 << 5,       0,           0},
+    { "steam",  NULL,       NULL,       1 << 2,       0,           0},
     { NULL,       NULL,       "scratchpad", 0,          1,           -1 },
     { "Code",     NULL,       NULL,       1 << 4,       0,           0},
+    { "0ad",      NULL,       NULL,       1 << 2,       0,           0},
     
     { "whatsapp", NULL,       NULL,       1 << 0,       0,           0},
     { "anytype",  NULL,       NULL,       1 << 3,       0,           0},
